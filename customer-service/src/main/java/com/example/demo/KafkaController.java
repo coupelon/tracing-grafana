@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.messaging.handler.annotation.SendTo;
 
 @Component
-public class Controller {
+public class KafkaController {
 
-  private Logger logger = LoggerFactory.getLogger(Controller.class);
+  private Logger logger = LoggerFactory.getLogger(KafkaController.class);
 
   @KafkaListener(groupId="${customerservice.consumer-group}", topics = "${customerservice.send-topics}")
   @SendTo
   public String listen(ConsumerRecord<String, Object> consumerRecord) {
-      return getCustomer(String.valueOf(consumerRecord.value())) + " " + getAddress(String.valueOf(consumerRecord.value()));
+      return getCustomer(String.valueOf(consumerRecord.value())) + " @" + getAddress(String.valueOf(consumerRecord.value()));
   }
 
   public String getCustomer(String customerIdValue) {

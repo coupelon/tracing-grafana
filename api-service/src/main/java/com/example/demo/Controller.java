@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +31,7 @@ public class Controller {
 
     ProducerRecord<String, Object> record = new ProducerRecord<>(SEND_TOPICS, customerId);
     RequestReplyFuture<String, Object, Object> replyFuture = template.sendAndReceive(record);
-    SendResult<String, Object> sendResult = replyFuture.getSendFuture().get(10, TimeUnit.SECONDS);
+    replyFuture.getSendFuture().get(10, TimeUnit.SECONDS);
     ConsumerRecord<String, Object> consumerRecord = replyFuture.get(10, TimeUnit.SECONDS);
     return consumerRecord.value();
   }

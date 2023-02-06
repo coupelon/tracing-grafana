@@ -2,45 +2,43 @@ package com.example.demo;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+import org.springframework.messaging.handler.annotation.SendTo;
 
-@RestController
+@Component
 public class Controller {
 
   private Logger logger = LoggerFactory.getLogger(Controller.class);
 
-  @GetMapping(path = "customers/{id}")
-  public ResponseEntity<Customer> getCustomer(@PathVariable("id") long customerId) {
-    logger.info("GETTING CUSTOMER WITH ID {}", customerId);
-    if (customerId < 0 || customerId > NAMES.size() - 1) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-    Customer customer = new Customer();
-    customer.setId(customerId);
-    customer.setName(NAMES.get((int) customerId));
-
-    return new ResponseEntity<>(customer, HttpStatus.OK);
+  @KafkaListener(groupId="${customerservice.consumer-group}", topics = "${customerservice.send-topics}")
+  @SendTo
+  public String listen(ConsumerRecord<String, Object> consumerRecord) {
+      return getCustomer(String.valueOf(consumerRecord.value())) + " " + getAddress(String.valueOf(consumerRecord.value()));
   }
 
-  @GetMapping(path = "addresses/{id}")
-  public ResponseEntity<Address> getAddress(@PathVariable("id") long customerId) throws InterruptedException {
-    logger.info("GETTING ADDRESS FOR CUSTOMER WITH ID {}", customerId);
+  public String getCustomer(String customerIdValue) {
+    logger.info("GETTING CUSTOMER WITH ID {}", customerIdValue);
+    long customerId = Long.parseLong(customerIdValue);
     if (customerId < 0 || customerId > NAMES.size() - 1) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      logger.info("No such CUSTOMER", customerId);
+      return "";
     }
-    Address address = new Address();
-    address.setId(customerId);
-    address.setStreet(STREETS.get((int) customerId));
+    return NAMES.get((int) customerId);
+  }
 
-    return new ResponseEntity<>(address, HttpStatus.OK);
+  public String  getAddress(String customerIdValue) {
+    logger.info("GETTING ADDRESS FOR CUSTOMER WITH ID {}", customerIdValue);
+    long customerId = Long.parseLong(customerIdValue);
+    if (customerId < 0 || customerId > NAMES.size() - 1) {
+      logger.info("No such CUSTOMER", customerId);
+      return "";
+    }
+    return STREETS.get((int) customerId);
   }
 
   private static final List<String> STREETS = Arrays.asList(

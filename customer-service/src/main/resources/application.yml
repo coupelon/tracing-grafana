@@ -1,19 +1,18 @@
 server.port: 8081
 
+customerservice:
+  send-topics: tracing-consumers
+  reply-topics: tracing-consumers-reply
+  consumer-group: tracing-grafana
+
 spring:
+  kafka:
+    bootstrap-servers: kafka:29092
   output:
     ansi:
       enabled: always
   application:
     name: customer-service
-
-  sleuth:
-    otel:
-      config:
-        trace-id-ratio-based: 1.0
-      exporter:
-        otlp:
-          endpoint: http://collector:4317
 
 management:
   endpoint:

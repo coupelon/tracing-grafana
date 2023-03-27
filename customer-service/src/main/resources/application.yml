@@ -23,3 +23,8 @@ management:
     web:
       exposure:
         include: beans
+  tracing:
+    enabled: true
+    sampling.probability: 1.0
+    
+otel.exporter.otlp.traces.endpoint: http://collector:4317

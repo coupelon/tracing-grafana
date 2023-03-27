@@ -19,6 +19,7 @@ The `docker-compose` command also starts up an OpenTelemetry Collector, to which
 ## Switching to Kafka demo
 
 - run `git switch kafka` 
+- recompile with `./mvnw clean install`
 - run `docker-compose -f kafka/docker-compose.yml up -d` to start kafka in the background
 - run the services with `docker-compose up --build`
 - start back with the same example
